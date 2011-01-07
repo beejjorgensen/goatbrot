@@ -10,38 +10,6 @@
  *    |||| #
  *    ````
  *
- * Build info:
- *
- *   Define GBOPENMP for OpenMP support.
- *
- *   OpenMP depends on mmap and ftruncate, currently.
- *
- *   gcc 4.2+ needed for OpenMP support.
- *
- *   Seen to work under Linux and OSX.  Probably works under all Unices.
- *   Needs work for Windows.
- *
- *   GCC: Use -fopenmp on command line.
- *
- *   XCode: In project, select GCC 4.2+, check "OpenMP" box.
- *
- *   Visual Studio: See "Future mods", below.  Use /openmp compiler switch.
- *
- *
- * Future mods:
- *
- *   Win32:
- *     Non-portable code in the following functions:
- *
- *        parse_command_line() calls getopt, replace with ???
- *
- *        These functions are only needed if GBOPENMP is set:
- *
- *        set_file_length()    calls ftruncate, replace with _chsize?
- *        memory_map_file()    calls mmap, replace with MapViewOfFile?
- *        memory_unmap_file()  calls munmap, replace with ???
- *
- *
  * See also:
  *
  *   http://netpbm.sourceforge.net/
