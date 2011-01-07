@@ -83,7 +83,7 @@ Related:
 
 License (MIT):
 
-  Copyright (c) Brian "Beej Jorgensen" Hall <beej@beej.us> 2011
+  Copyright (c) 2011  Brian "Beej Jorgensen" Hall <beej@beej.us>
 
   Permission is hereby granted, free of charge, to any person obtaining
   a copy of this software and associated documentation files (the
