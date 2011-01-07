@@ -5,12 +5,13 @@ NAME=goatbrot
 # options for OpenMP support
 GBCCOPTS=-Wall -Wextra -O2 -fopenmp -DGBOPENMP -g
 GBLDOPTS=-fopenmp
-GBLIBS=-lm
 
 # options for single-threaded (no OpenMP):
 #GBCCOPTS=-Wall -Wextra -O2
 #GBLDOPTS=
-#GBLIBS=-lm
+
+# general options:
+GBLIBS=-lm
 
 all: $(NAME)
 

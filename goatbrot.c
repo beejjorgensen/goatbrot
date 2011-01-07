@@ -1,5 +1,4 @@
 /**
- *
  * goatbrot -- generate mandelbrot set images in PPM format
  *
  * goatbrot -h for usage information.
@@ -43,6 +42,8 @@
 #include <math.h>
 #include <unistd.h>
 #include <float.h>
+
+#define VERSION "1.0"
 
 /* define GBOPENMP for OpenMP support */
 //#define GBOPENMP
@@ -257,10 +258,12 @@ void usage_exit(char *str) {
 		fprintf(stderr, "%s: %s\n", APPNAME, str);
 	} else {
 #ifdef GBOPENMP
-		fprintf(stderr, "usage: %s -o outfilename [options]\n", APPNAME);
+		fprintf(stderr, "usage:   %s -o outfilename [options]\n", APPNAME);
 #else
-		fprintf(stderr, "usage: %s [options]\n", APPNAME);
+		fprintf(stderr, "usage:   %s [options]\n", APPNAME);
 #endif
+		fprintf(stderr, "\nversion: %s\n\n", VERSION);
+
 		fprintf(stderr, "   -e examplenum            example render (1-%d) (should be first option)\n", EXAMPLE_SCENE_COUNT);
 
 #ifdef GBOPENMP
@@ -276,6 +279,7 @@ void usage_exit(char *str) {
 		fprintf(stderr, "   -a                       antialias\n");
 		fprintf(stderr, "   -u                       continuous smoothing\n");
 		fprintf(stderr, "   -q                       no informational output\n");
+		fprintf(stderr, "   -v                       print version and exit\n");
 
 #ifdef GBOPENMP
 		fprintf(stderr, "   -t numthreads            set number of threads\n");
@@ -325,10 +329,15 @@ void parse_command_line(int argc, char **argv)
 #endif
 
 
-	while ((opt = getopt(argc, argv, "o:c:w:s:i:auqt:m:he:")) != -1) {
+	while ((opt = getopt(argc, argv, "o:c:w:s:i:auqt:m:he:v")) != -1) {
 		switch (opt) {
 			case 'h':
 				usage_exit(NULL);
+				break;
+
+			case 'v':
+				fprintf(stdout, "%s: version %s\n", APPNAME, VERSION);
+				exit(0);
 				break;
 
 			case 'o':  // outfile name

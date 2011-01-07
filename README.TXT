@@ -38,7 +38,15 @@ Usage: goatbrot -o outfilename [options]
                                fire
                                water
 
+   Output is a PPM file, which can be converted to another format with
+   netpbm, ImageMagick, GIMP, or anything similar.
+
+   Currently only non-OpenMP builds support streaming output.
+
+   
 Build info:
+
+  See the Makefile for setting OpenMP vs non-OpenMP build options.
 
   Define GBOPENMP for OpenMP support.
 
