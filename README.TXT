@@ -6,6 +6,21 @@ goatbrot -- generate mandelbrot set images in PPM format
    |||| #
    ````
 
+Features:
+
+  * Compiles with optional OpenMP support for multicore machines
+
+  * Supports very large images
+
+  * Multiple built-in themes
+
+  * Both discrete and continuous rendering
+
+  * Antialiasing
+
+  * Harms no goats!
+
+
 Usage: goatbrot -o outfilename [options]
 
    -e examplenum            example render (1-8) (should be first option)
