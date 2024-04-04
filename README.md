@@ -2,13 +2,13 @@
 
 Generate Mandelbrot set images in PPM format
 
-```
+`````
       )_)
    ___|oo)   Mandelbrot Set generation--
   '|  |\_|                               --for goats!
    |||| #
    ````
-```
+`````
 
 ## Features
 
