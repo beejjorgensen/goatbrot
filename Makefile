@@ -17,7 +17,7 @@ endif
 all: $(NAME)
 
 $(NAME): $(NAME).o
-	$(CC) $(LDOPTS) -o $@ $< $(GBLIBS)
+	$(CC) $(LDOPTS) -o $@ $<
 
 $(NAME).o: $(NAME).c
 	$(CC) -c $(CCOPTS) $<
