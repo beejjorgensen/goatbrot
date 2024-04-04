@@ -1,0 +1,4 @@
+*.dSYM
+goatbrot
+*.o
+*.ppm

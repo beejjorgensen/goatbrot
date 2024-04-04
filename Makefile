@@ -2,24 +2,25 @@
 
 NAME=goatbrot
 
-# options for OpenMP support
-GBCCOPTS=-Wall -Wextra -O2 -fopenmp -DGBOPENMP -g
-GBLDOPTS=-fopenmp
+OS=$(shell uname)
 
-# options for single-threaded (no OpenMP):
-#GBCCOPTS=-Wall -Wextra -O2
-#GBLDOPTS=
+#DEBUG=-g
 
-# general options:
-GBLIBS=-lm
+ifeq ($(OS),Linux)
+	CCOPTS=-Wall -Wextra -O2 -fopenmp $(DEBUG)
+	LDOPTS=-fopenmp -lm
+else ifeq ($(OS),Darwin)
+	CCOPTS=-Wall -Wextra -O2 -Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include/ $(DEBUG)
+	LDOPTS=-Xpreprocessor -fopenmp -L/usr/local/opt/libomp/lib/ -lomp
+endif
 
 all: $(NAME)
 
 $(NAME): $(NAME).o
-	$(CC) $(GBLDOPTS) -o $@ $< $(GBLIBS)
+	$(CC) $(LDOPTS) -o $@ $< $(GBLIBS)
 
 $(NAME).o: $(NAME).c
-	$(CC) -c $(GBCCOPTS) $<
+	$(CC) -c $(CCOPTS) $<
 
 clean:
 	rm -f $(NAME).o

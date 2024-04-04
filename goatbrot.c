@@ -42,20 +42,11 @@
 #include <math.h>
 #include <unistd.h>
 #include <float.h>
-
-#define VERSION "1.0"
-
-/* define GBOPENMP for OpenMP support */
-//#define GBOPENMP
-
-#ifdef GBOPENMP
-
 #include <omp.h>
 #include <sys/mman.h>
 #include <errno.h>
 
-#endif
-
+#define VERSION "1.0"
 
 #define APPNAME "goatbrot"
 
@@ -143,13 +134,7 @@ struct app_context {
 	struct mandelbrot_info mandelbrot_info;
 	char *outfile_name;
 	int quiet;
-
-#ifdef GBOPENMP
-
 	int num_threads;
-
-#endif
-
 } app_context;
 
 /**
@@ -257,21 +242,10 @@ void usage_exit(char *str) {
 	if (str != NULL) {
 		fprintf(stderr, "%s: %s\n", APPNAME, str);
 	} else {
-#ifdef GBOPENMP
 		fprintf(stderr, "usage:   %s -o outfilename [options]\n", APPNAME);
-#else
-		fprintf(stderr, "usage:   %s [options]\n", APPNAME);
-#endif
 		fprintf(stderr, "\nversion: %s\n\n", VERSION);
-
 		fprintf(stderr, "   -e examplenum            example render (1-%d) (should be first option)\n", EXAMPLE_SCENE_COUNT);
-
-#ifdef GBOPENMP
 		fprintf(stderr, "   -o outfilename           set output name\n");
-#else
-		fprintf(stderr, "   -o outfilename|-         set output name\n");
-#endif
-
 		fprintf(stderr, "   -c re,im                 set center point\n");
 		fprintf(stderr, "   -w width                 set real width\n");
 		fprintf(stderr, "   -s width,height          set pixel output size\n");
@@ -280,10 +254,7 @@ void usage_exit(char *str) {
 		fprintf(stderr, "   -u                       continuous smoothing\n");
 		fprintf(stderr, "   -q                       no informational output\n");
 		fprintf(stderr, "   -v                       print version and exit\n");
-
-#ifdef GBOPENMP
 		fprintf(stderr, "   -t numthreads            set number of threads\n");
-#endif
 
 		fprintf(stderr, "   -m theme                 set theme--names are:\n");
 
@@ -301,13 +272,7 @@ void usage_exit(char *str) {
 void parse_command_line(int argc, char **argv)
 {
 	int j, opt, example_num;
-
-#ifdef GBOPENMP
-
 	int num_threads = -1;
-
-#endif
-
 	enum theme_type t;
 
 	app_context.mandelbrot_info.center_re = DEFAULT_CENTER_REAL;
@@ -321,13 +286,7 @@ void parse_command_line(int argc, char **argv)
 	app_context.mandelbrot_info.continuous = 0;
 	app_context.outfile_name = "-";
 	app_context.quiet = 0;
-
-#ifdef GBOPENMP
-
 	app_context.num_threads = 1;
-
-#endif
-
 
 	while ((opt = getopt(argc, argv, "o:c:w:s:i:auqt:m:he:v")) != -1) {
 		switch (opt) {
@@ -366,7 +325,7 @@ void parse_command_line(int argc, char **argv)
 				break;
 
 			case 's': // output image size
-				if (sscanf(optarg, "%Ld,%Ld", &app_context.mandelbrot_info.width_px,
+				if (sscanf(optarg, "%lld,%lld", &app_context.mandelbrot_info.width_px,
 					&app_context.mandelbrot_info.height_px) != 2) {
 					
 					usage_exit(NULL);
@@ -397,8 +356,6 @@ void parse_command_line(int argc, char **argv)
 				app_context.mandelbrot_info = example_scene[example_num-1];
 				break;
 
-#ifdef GBOPENMP
-
 			case 't': // num threads
 				if (sscanf(optarg, "%d", &num_threads) != 1) {
 					usage_exit(NULL);
@@ -408,8 +365,6 @@ void parse_command_line(int argc, char **argv)
 					usage_exit("number of threads must be positive, silly!");
 				}
 				break;
-
-#endif
 
 			case 'm': // theme
 				t = THEME_NONE;
@@ -429,7 +384,6 @@ void parse_command_line(int argc, char **argv)
 		}
 	}
 
-#ifdef GBOPENMP
 	// set max threads if requested
 	if (num_threads > 0) {
 		app_context.num_threads = num_threads;
@@ -440,7 +394,6 @@ void parse_command_line(int argc, char **argv)
 	if (strcmp(app_context.outfile_name, "-") == 0) {
 		usage_exit(NULL);
 	}
-#endif
 
 	// calculate other image attributes from those given
 	app_context.mandelbrot_info.height_im = app_context.mandelbrot_info.width_re * app_context.mandelbrot_info.height_px / app_context.mandelbrot_info.width_px;
@@ -449,9 +402,6 @@ void parse_command_line(int argc, char **argv)
 	app_context.mandelbrot_info.top_im = app_context.mandelbrot_info.center_im + (app_context.mandelbrot_info.height_im / 2);
 	app_context.mandelbrot_info.bottom_im = app_context.mandelbrot_info.center_im - (app_context.mandelbrot_info.height_im / 2);
 }
-
-
-#ifdef GBOPENMP
 
 /**
  * Set a file's length to this size.
@@ -490,9 +440,6 @@ int memory_unmap_file(void *addr, size_t len)
 	return munmap(addr, len);
 }
 
-#endif // GBOPENMP
-
-
 /**
  * Write a PPM header
  */
@@ -501,8 +448,8 @@ int write_ppm_header(FILE *fp)
 	int len = 0;
 
 	len += fprintf(fp, "P6\n"); /* raw RGB */
-	len += fprintf(fp, "# Created by Beejebrot\n");
-	len += fprintf(fp, "%Ld %Ld\n", app_context.mandelbrot_info.width_px, app_context.mandelbrot_info.height_px);
+	len += fprintf(fp, "# Created by Goatbrot\n");
+	len += fprintf(fp, "%lld %lld\n", app_context.mandelbrot_info.width_px, app_context.mandelbrot_info.height_px);
 	len += fprintf(fp, "255\n");
 
 	return len;
@@ -521,20 +468,14 @@ void output_process_info(void)
 	fprintf(stderr, "       Lower Right: %.*Lg + %.*Lgi\n", LDBL_DIG, app_context.mandelbrot_info.right_re, LDBL_DIG, app_context.mandelbrot_info.bottom_im);
 	fprintf(stderr, "\nOutput image:\n");
 	fprintf(stderr, "          Filename: %s\n", app_context.outfile_name);
-	fprintf(stderr, "     Width, Height: %Ld, %Ld\n", app_context.mandelbrot_info.width_px, app_context.mandelbrot_info.height_px);
+	fprintf(stderr, "     Width, Height: %lld, %lld\n", app_context.mandelbrot_info.width_px, app_context.mandelbrot_info.height_px);
 	fprintf(stderr, "             Theme: %s\n", theme[app_context.mandelbrot_info.theme].name);
 	fprintf(stderr, "       Antialiased: %s\n", app_context.mandelbrot_info.antialias? "yes": "no");
 	fprintf(stderr, "\nMandelbrot:\n");
 	fprintf(stderr, "    Max Iterations: %d\n", app_context.mandelbrot_info.max_iterations);
 	fprintf(stderr, "        Continuous: %s\n", app_context.mandelbrot_info.continuous? "yes": "no");
 	fprintf(stderr, "\nGoatbrot:\n");
-
-#ifdef GBOPENMP
 	fprintf(stderr, "       Num Threads: %d\n", omp_get_max_threads());
-#else
-	fprintf(stderr, "    Multithreading: not supported in this build\n");
-#endif
-
 	fprintf(stderr, "\n");
 }
 
@@ -547,8 +488,6 @@ void mandelbrot(struct mandelbrot_info *minfo, FILE *fp, int show_progress)
 	long long image_pixels = app_context.mandelbrot_info.width_px * app_context.mandelbrot_info.height_px;
 	int total_pixels = 0;
     time_to_color_function time_to_color = theme[app_context.mandelbrot_info.theme].time_to_color;
-
-#ifdef GBOPENMP
 
 	unsigned char *filedata, *pixeldata;
 	int ppm_header_len;
@@ -574,19 +513,7 @@ void mandelbrot(struct mandelbrot_info *minfo, FILE *fp, int show_progress)
 
 	pixeldata = filedata + ppm_header_len;
 
-#else
-
-	write_ppm_header(fp);
-
-#endif
-
-
-#ifdef GBOPENMP
-
 #pragma omp parallel for
-
-#endif
-
 	for (y = 0; y < minfo->height_px; y++) {
 		// these must be declared in here to be thread-private for
 		// OpenMP:
@@ -597,10 +524,8 @@ void mandelbrot(struct mandelbrot_info *minfo, FILE *fp, int show_progress)
 		int r[4], g[4], b[4]; // ul, ur, ll, lr
 		long double t[4];
 		
-#ifdef GBOPENMP
 		unsigned char *xbasedata;
 		unsigned char *ybasedata = y * minfo->width_px * 3 + pixeldata;
-#endif
 
 		cy1 = minfo->top_im - (minfo->height_im * y / minfo->height_px);
 
@@ -613,9 +538,7 @@ void mandelbrot(struct mandelbrot_info *minfo, FILE *fp, int show_progress)
 			int max_iterations = app_context.mandelbrot_info.max_iterations;
 			int continuous = app_context.mandelbrot_info.continuous;
 
-#ifdef GBOPENMP
 			xbasedata = ybasedata + x * 3;
-#endif
 
 			cx1 = (minfo->width_re * x / minfo->width_px) +
 				minfo->left_re;
@@ -646,18 +569,11 @@ void mandelbrot(struct mandelbrot_info *minfo, FILE *fp, int show_progress)
 			}
 
 			/* write the pixel */
-#ifdef GBOPENMP
 			memcpy(xbasedata, rgb, sizeof rgb);
-#else
-			fwrite(rgb, sizeof rgb[0], sizeof rgb / sizeof rgb[0], fp);
-#endif
 		} /* for x */
 
 		if (show_progress) {
-
-#ifdef GBOPENMP
 			#pragma omp critical
-#endif
 			{
 				total_pixels += minfo->width_px;
 				fprintf(stderr, "   \rCompleted: %.1f%%",
@@ -672,12 +588,10 @@ void mandelbrot(struct mandelbrot_info *minfo, FILE *fp, int show_progress)
 		fprintf(stderr, "\n");
 	}
 
-#ifdef GBOPENMP
 	if (memory_unmap_file(filedata, total_file_length) == -1) {
 		perror("memory_unmap_file");
 		exit(2);
 	}
-#endif
 
 	fclose(fp);
 }
