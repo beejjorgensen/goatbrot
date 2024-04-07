@@ -9,9 +9,13 @@ OS=$(shell uname)
 ifeq ($(OS),Linux)
 	CCOPTS=-Wall -Wextra -O2 -fopenmp $(DEBUG)
 	LDOPTS=-fopenmp -lm
+
 else ifeq ($(OS),Darwin)
-	CCOPTS=-Wall -Wextra -O2 -Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include/ $(DEBUG)
-	LDOPTS=-Xpreprocessor -fopenmp -L/usr/local/opt/libomp/lib/ -lomp
+	SEARCHDIRS=/usr/local/opt/libomp /opt/homebrew/opt/libomp
+	FOUNDDIRS=$(wildcard $(SEARCHDIRS))
+	BASELIBDIR=$(word 1, $(FOUNDDIRS))
+	CCOPTS=-Wall -Wextra -O2 -Xpreprocessor -fopenmp -I$(BASELIBDIR)/include/ $(DEBUG)
+	LDOPTS=-Xpreprocessor -fopenmp -L$(BASELIBDIR)/lib/ -lomp
 endif
 
 all: $(NAME)
